@@ -1,0 +1,6 @@
+langchain
+chromadb
+ollama
+beautifulsoup4
+lxml
+tqdm
