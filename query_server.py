@@ -15,6 +15,7 @@ app = FastAPI(
 
 DB_PATH = "./chroma_db"
 EMB_MODEL = "embeddinggemma:300m-qat-q4_0"
+# EMB_MODEL = "qwen3-embedding:0.6b"
 
 # ---------------- 初始化 ----------------
 
@@ -48,6 +49,7 @@ class DocumentResponse(BaseModel):
     source: Optional[str] = None
     class_name: Optional[str] = None
     method: Optional[str] = None
+    type: Optional[str] = None
     score: float
 
 
@@ -61,37 +63,36 @@ class DocumentResponse(BaseModel):
 async def retrieve_docs(request: QueryRequest):
 
     try:
-
-        test_emb = embeddings.embed_query("test")
-        print(f"Embedding type: {type(test_emb)}, Length: {len(test_emb)}")
-
-
         print(f"\nQuery: {request.prompt}")
         print(f"TopK: {request.top_k}")
 
         # 向量搜索
         results = vectorstore.similarity_search_with_score(
             request.prompt,
-            k=request.top_k
+            k=request.top_k,
+            filter={"type":"api"}
         )
 
         docs = []
 
         for doc, score in results:
-
+            if score > 1.2:
+                continue
+            
             docs.append(
                 DocumentResponse(
                     content=doc.page_content,
                     source=doc.metadata.get("source"),
                     class_name=doc.metadata.get("class"),
-                    method=doc.metadata.get("method"),
+                    method=doc.metadata.get("section"),
+                    type=doc.metadata.get("type"),
                     score=float(score)
                 )
             )
 
         print(f"Returned docs: {len(docs)}")
 
-        print(docs)
+        # print(docs)
 
         return docs
 

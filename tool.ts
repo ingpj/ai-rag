@@ -1,28 +1,44 @@
 import { tool } from "@opencode-ai/plugin"
 
+function rewriteQuery(q: string) {
+
+  const apiMatch = q.match(/[A-Z][A-Za-z0-9_]+/)
+
+  if (apiMatch) {
+    return apiMatch[0]
+  }
+
+  return q
+}
+
 export default tool({
 
-  description:
-    // "Search the official Godot 4 documentation including Node classes, GDScript syntax and engine API. Use this whenever the user asks about Godot nodes, signals, scripting or engine features.",
-    `
-    Search the official Godot 4 documentation.
+  description: `
+    Search the official Godot Engine documentation.
 
-    Use this tool whenever the user asks about:
+    IMPORTANT:
 
-    - Godot nodes (Node2D, CharacterBody2D, Control, etc.)
-    - GDScript syntax
-    - signals
-    - scene tree
-    - physics
-    - rendering
-    - engine API
-    `,
+    Convert the user question into a SHORT API search query.
+
+    Examples:
+
+    User: How to add child node?
+    Query: Node add_child
+
+    User: How to move CharacterBody3D?
+    Query: CharacterBody3D move_and_slide
+
+    User: How to use TileMapLayer?
+    Query: TileMapLayer
+  `,
 
   args: {
     query: tool.schema.string().describe(
       "Godot 4 technical question or API keyword"
     )
   },
+
+
 
   async execute(args) {
 
@@ -31,8 +47,10 @@ export default tool({
       headers: {
         "Content-Type": "application/json"
       },
+
+      
       body: JSON.stringify({
-        prompt: args.query,
+        prompt: rewriteQuery(args.query),
         top_k: 5
       })
     })
