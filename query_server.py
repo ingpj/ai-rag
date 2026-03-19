@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 from typing import List, Optional
@@ -63,7 +65,8 @@ class DocumentResponse(BaseModel):
 async def retrieve_docs(request: QueryRequest):
 
     try:
-        print(f"\nQuery: {request.prompt}")
+        print(f"\nDateTime: {datetime.now()}")
+        print(f"Query: {request.prompt}")
         print(f"TopK: {request.top_k}")
 
         # 向量搜索

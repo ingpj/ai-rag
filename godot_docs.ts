@@ -2,13 +2,9 @@ import { tool } from "@opencode-ai/plugin"
 
 function rewriteQuery(q: string) {
 
-  const apiMatch = q.match(/[A-Z][A-Za-z0-9_]+/)
-
-  if (apiMatch) {
-    return apiMatch[0]
-  }
-
-  return q
+  // 尝试保留 类名 + 方法名组合
+  const apiMatch = q.match(/[A-Z][A-Za-z0-9_]*(?:\s+[a-z_][A-Za-z0-9_]*)?/)
+  return apiMatch ? apiMatch[0] : q
 }
 
 export default tool({
@@ -51,7 +47,7 @@ export default tool({
       
       body: JSON.stringify({
         prompt: rewriteQuery(args.query),
-        top_k: 5
+        top_k: 7
       })
     })
 
